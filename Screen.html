@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <script type="text/javascript">
+        var pointSize = 3;
+        
+        function fnNext()
+        {
+            document.getElementById("Mode").value = 1
+            document.getElementById("Form1").submit()
+        }
+
+        function fnPerv()
+        {
+            document.getElementById("Mode").value = 2
+            document.getElementById("Form1").submit()
+        }
+
+        function fnReset()
+        {
+            document.getElementById("Mode").value = 4
+            document.getElementById("Form1").submit()
+        }
+
+        function fnSave()
+        {
+            document.getElementById("Mode").value = 3
+            alert("Data Saved")
+            document.getElementById("Form1").submit()
+        }
+
+        function getPosition(event){
+            var rect = canvas.getBoundingClientRect();
+            var x = event.clientX - rect.left;
+            var y = event.clientY - rect.top;
+                
+            drawCoordinates(x,y);
+            document.getElementById("Mode").value = 3
+            document.getElementById("iscallback").value = 0
+            document.getElementById("Form1").submit()
+        }
+
+        function drawCoordinates(x,y){	
+            var ctx = document.getElementById("canvas").getContext("2d");
+
+            document.getElementById("X").value = x
+            document.getElementById("Y").value = y
+            ctx.fillStyle = "#ff2626"; // Red color
+
+            ctx.beginPath();
+            ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+
+		</script>
+    </head>
+    <body>
+        <div>
+            <form method="POST" action="/Show" id="Form1">
+                <table>
+                    <tr>
+                        <td>
+                            <canvas id="canvas" style="background-image:url(data:image/jpg;base64,{{.image}})" width="640" height="360" onclick="getPosition(event)" >
+                        </td>
+                        <td style="display: none">
+                            <input type="radio" value="C" name="Option" /> Crowded <br>
+                            <input type="radio" value="NC" name="Option" /> NonCrowded <br>
+                            <input type="button" value="Save" name="BTN_Save" id="BTN_Save" onclick="fnSave()" width="100" style="display: none"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="hidden" id="Mode" name="Mode" />
+                            <input type="hidden" id="iscallback" name="iscallback" />
+                            <input type="hidden" id="X" name="X" />
+                            <input type="hidden" id="Y" name="Y" />
+                            <input type="button" value="Perv" name="BTN_PRV" id="BTN_PRV" onclick="fnPerv()" width="150"/>
+                            <input type="button" value="Next" name="BTN_NXT" id="BTN_NXT" onclick="fnNext()" width="150"/>
+                            <input type="button" value="Reset" name="BTN_RST" id="BTN_RST" onclick="if(confirm('maur reset?'))fnReset()" width="50"/>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </body>
+</html>
