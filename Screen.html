@@ -99,14 +99,19 @@
             const arrayReg = new RegExp("\\[.+\\]")
             const squareBracketReg = new RegExp("(\\[|\\])", "g")
 
-            const coorX = document.getElementById("coordinatesX").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
-            const coorY = document.getElementById("coordinatesY").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
+            try {
+                const coorX = document.getElementById("coordinatesX").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
+                const coorY = document.getElementById("coordinatesY").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
 
-            coorX.forEach((pointX, index) => {
-                const pointY = coorY[index]
+                coorX.forEach((pointX, index) => {
+                    const pointY = coorY[index]
 
-                drawCoordinates(pointX, pointY)
-            })
+                    drawCoordinates(pointX, pointY)
+                })
+            } catch {
+
+            }
+
         </script>
     </body>
 </html>
