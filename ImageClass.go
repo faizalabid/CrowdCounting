@@ -79,18 +79,6 @@ func SaveRedDot(x string, y string, filenm string, no string) {
 
 //ImageClassHandler Screen
 func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-
-	responseData := struct {
-		Mode string `json:"mode"`
-		X    string `json:"X"`
-		Y    string `json:"Y"`
-	}{}
-
-	d.Decode(&responseData)
-	log.Println(responseData)
-
 	img := ""
 
 	err := r.ParseForm()
@@ -98,13 +86,27 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	k := responseData.Mode
+	k := r.PostFormValue("Mode")
+	X := ""
+	Y := ""
 	if k == "" {
-		k = r.PostFormValue("Mode")
+		d := json.NewDecoder(r.Body)
+		d.DisallowUnknownFields()
+
+		responseData := struct {
+			Mode string `json:"mode"`
+			X    string `json:"X"`
+			Y    string `json:"Y"`
+		}{}
+
+		d.Decode(&responseData)
+		log.Println(responseData)
+
+		k = responseData.Mode
+		X = responseData.X
+		Y = responseData.Y
 	}
 
-	X := responseData.X
-	Y := responseData.Y
 	// PostBack := r.Form.Get("iscallback")
 	if k == "1" {
 		no = no + 1
