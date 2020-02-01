@@ -125,39 +125,45 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		SaveRedDot(X, Y, filenm, strconv.Itoa(no))
 	}
 
-	var data = map[string]string{"image": img}
+	//retrive dot
+	Xall, Yall := RetriveDot(filenm)
+
+	log.Println(Xall)
+	log.Println(Yall)
+
+	var data = map[string]string{"image": img, "X": Xall, "Y": Yall}
 
 	t, _ := template.ParseFiles("Screen.html")
 	t.Execute(w, data)
 }
 
 //RetriveDot Retrive dot from Database
-// func RetriveDot(myImage image.Image, FILENAME string) image.Image {
-// 	imageRect := myImage.Bounds()
-// 	Image1 := image.NewYCbCr(imageRect, image.YCbCrSubsampleRatio420)
-// 	conn := GetConn()
-// 	rows, err := conn.Query("select X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
+func RetriveDot(FILENAME string) (string, string) {
 
-// 	var (
-// 		X float64
-// 		Y float64
-// 	)
+	conn := GetConn()
+	rows, err := conn.Query("select X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
+	if err != nil {
+		fmt.Println(err)
+	}
 
-// 	for rows.Next() {
-// 		if err := rows.Scan(&X, &Y); err == nil {
-// 			xin := int(math.Round(X))
-// 			yin := int(math.Round(Y))
+	var (
+		X   string
+		Y   string
+		xtr string
+		ytr string
+	)
 
-// 			var colRED = color.RGBA{255, 0, 0, 255}
-// 			Image1.Set(xin, yin, colRED)
-// 		}
-// 	}
+	for rows.Next() {
+		if err := rows.Scan(&X, &Y); err == nil {
+			xtr = xtr + X + ","
+			ytr = xtr + Y + ","
+			//xtr = append(xtr, X)
+			//ytr = append(ytr, Y)
+		}
+	}
 
-// 	return Image1
-// }
+	return xtr, ytr
+}
 
 //EncodeImage file image to base64
 func EncodeImage(images os.FileInfo) string {
