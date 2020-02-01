@@ -93,14 +93,16 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 
 	img := ""
 
-	// testAbc := r.Body
-
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	k := responseData.Mode
+	if k == "" {
+		k = r.PostFormValue("Mode")
+	}
+
 	X := responseData.X
 	Y := responseData.Y
 	// PostBack := r.Form.Get("iscallback")
@@ -161,6 +163,9 @@ func RetriveDot(FILENAME string) (string, string) {
 			//ytr = append(ytr, Y)
 		}
 	}
+
+	// xtr := "323,412,426"
+	// ytr := "144,156,133"
 
 	return xtr, ytr
 }
