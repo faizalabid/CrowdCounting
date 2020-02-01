@@ -72,7 +72,7 @@ func ResetDot(no string) {
 
 //SaveRedDot SAVE
 func SaveRedDot(x string, y string, filenm string, no string) {
-	Q := "INSERT INTO GROUNDTRUTH_DATA(FILENAME,X,Y,SEQ,TYPE) " + "VALUES('" + filenm + "','" + x + "','" + y + "','" + "null" + "','Train')"
+	Q := "INSERT INTO GROUNDTRUTH_DATA(FILENAME,X,Y,SEQ,TYPE) " + "VALUES('" + filenm + "','" + x + "','" + y + "','" + no + "','Train')"
 
 	QueryExecDB(Q)
 }
@@ -168,7 +168,7 @@ func RetriveDot(FILENAME string) (string, string) {
 //EncodeImage file image to base64
 func EncodeImage(images os.FileInfo) string {
 
-	ImgFile, err := os.Open("./PhotoFolder/faild/" + images.Name())
+	ImgFile, err := os.Open("./PhotoFolder/train/" + images.Name())
 	if err != nil {
 		// Handle error
 	}
@@ -193,7 +193,7 @@ func EncodeImage(images os.FileInfo) string {
 
 //Readfile => FUngsi Baca File from directory
 func Readfile(i int) os.FileInfo {
-	files, err1 := ioutil.ReadDir("./PhotoFolder/faild/")
+	files, err1 := ioutil.ReadDir("./PhotoFolder/train/")
 	if err1 != nil {
 		log.Fatal(err1)
 	}
