@@ -130,46 +130,48 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//retrive dot
-	Xall, Yall := RetriveDot(filenm)
+	point := RetriveDot(filenm)
 
-	log.Println(Xall)
-	log.Println(Yall)
+	log.Println(point)
 
-	var data = map[string]string{"image": img, "X": Xall, "Y": Yall}
+	var data = map[string]string{"image": img, "points": point}
 
 	t, _ := template.ParseFiles("Screen.html")
 	t.Execute(w, data)
 }
 
 //RetriveDot Retrive dot from Database
-func RetriveDot(FILENAME string) (string, string) {
+func RetriveDot(FILENAME string) string {
 
 	conn := GetConn()
-	rows, err := conn.Query("select X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
+	rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	var (
-		X   string
-		Y   string
-		xtr string
-		ytr string
+		X      string
+		Y      string
+		id     string
+		str    string
+		result string
 	)
 
+	start := "["
+	end := "]"
+	spr := ","
+
 	for rows.Next() {
-		if err := rows.Scan(&X, &Y); err == nil {
-			xtr = xtr + X + ","
-			ytr = ytr + Y + ","
-			//xtr = append(xtr, X)
-			//ytr = append(ytr, Y)
+		if err := rows.Scan(&id, &X, &Y); err == nil {
+			str = start + id + spr + X + spr + Y + end + spr
+			result = result + str
 		}
 	}
 
 	// xtr := "323,412,426"
 	// ytr := "144,156,133"
 
-	return xtr, ytr
+	return start + result + end
 }
 
 //EncodeImage file image to base64
