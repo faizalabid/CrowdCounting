@@ -5,10 +5,13 @@
     </head>
     <body>
         <div>
-            <form method="POST" action="/Submit" id="Form1">
-                <div>
-                    {{.X}}
-                    {{.Y}}
+            <form method="POST" action="/Show" id="Form1">
+                <div id="coordinatesX">
+                    X Coordinates: [{{.X}}]
+                </div>
+
+                <div id="coordinatesY">
+                    Y Coordinates: [{{.Y}}]
                 </div>
                 <table>
                     <tr>
@@ -92,6 +95,18 @@
                 ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
                 ctx.fill();
             }
+
+            const arrayReg = new RegExp("\\[.+\\]")
+            const squareBracketReg = new RegExp("(\\[|\\])", "g")
+
+            const coorX = document.getElementById("coordinatesX").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
+            const coorY = document.getElementById("coordinatesY").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
+
+            coorX.forEach((pointX, index) => {
+                const pointY = coorY[index]
+
+                drawCoordinates(pointX, pointY)
+            })
         </script>
     </body>
 </html>
