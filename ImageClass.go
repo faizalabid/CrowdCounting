@@ -156,7 +156,7 @@ func RetriveDot(FILENAME string) (string, string) {
 	for rows.Next() {
 		if err := rows.Scan(&X, &Y); err == nil {
 			xtr = xtr + X + ","
-			ytr = xtr + Y + ","
+			ytr = ytr + Y + ","
 			//xtr = append(xtr, X)
 			//ytr = append(ytr, Y)
 		}
