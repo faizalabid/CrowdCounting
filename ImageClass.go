@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"html/template"
+
 	//"image"
 	//"image/draw"
-    "strconv"
+	"strconv"
 
 	//"image/png"
 	//"image/color"
@@ -16,6 +18,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+
 	//"math"
 	"net/http"
 	"os"
@@ -61,7 +64,7 @@ func GetConn() *sql.DB {
 }
 
 //ResetDot reset dot sesuai nomor
-func ResetDot (no string){
+func ResetDot(no string) {
 	Q := "delete GROUNDTRUTH_DATA WHERE type = 'Train' and seq = '" + no + "'"
 
 	QueryExecDB(Q)
@@ -76,16 +79,30 @@ func SaveRedDot(x string, y string, filenm string, no string) {
 
 //ImageClassHandler Screen
 func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+
+	responseData := struct {
+		Mode string `json:"mode"`
+		X    string `json:"X"`
+		Y    string `json:"Y"`
+	}{}
+
+	d.Decode(&responseData)
+	log.Println(responseData)
+
 	img := ""
+
+	// testAbc := r.Body
 
 	err := r.ParseForm()
 	if err != nil {
 		log.Fatal(err)
 	}
-    
-	k := r.PostFormValue("Mode")
-	X := r.PostFormValue("X")
-	Y := r.PostFormValue("Y")
+
+	k := responseData.Mode
+	X := responseData.X
+	Y := responseData.Y
 	// PostBack := r.Form.Get("iscallback")
 	if k == "1" {
 		no = no + 1
@@ -93,7 +110,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		no = no - 1
 	} else if k == "3" {
 		no = no + 0
-	} else if k == "4"{
+	} else if k == "4" {
 		ResetDot(strconv.Itoa(no))
 	} else {
 		no = 0
