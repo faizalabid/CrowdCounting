@@ -11,7 +11,7 @@
     </head>
     <body>
         <div>
-            <input method="POST" action="/Show" id="Form1">
+            <form method="POST" action="/Show" id="Form1">
                 <table>
 
                     <tr>
@@ -150,9 +150,13 @@
 
             function fnGoTo() {
                 document.getElementById("Mode").value = 5
-                document.getElementById("Seq").value = parseInt(document.getElementById("inputGoTo").value)
+                document.getElementById("Seq").value = document.getElementById("inputGoTo").value
                 document.getElementById("Form1").submit()
             }
+
+            document.getElementById("buttonGoTo").addEventListener("click", () => {
+                fnGoTo()
+            })
 
             function getPosition(event){
                 var rect = document.getElementById("canvas").getBoundingClientRect();

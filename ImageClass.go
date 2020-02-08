@@ -22,17 +22,18 @@ import (
 	// "math"
 	"net/http"
 	"os"
+
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
 var (
 	no         int
 	sqlversion string
-	Next = "1"
-	Prev = "2"
-	Add = "3"
-	Delete = "4"
-	GoToSeq = "5"
+	Next       = "1"
+	Prev       = "2"
+	Add        = "3"
+	Delete     = "4"
+	GoToSeq    = "5"
 )
 
 func main() {
@@ -92,7 +93,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	k := r.PostFormValue("Mode")
-	noFrontEnd := 0
+	noFrontEnd := r.PostFormValue("Seq")
 	X := ""
 	Y := ""
 	var SeqID []string
@@ -105,7 +106,6 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 			X     string   `json:"X"`
 			Y     string   `json:"Y"`
 			SeqID []string `json:"SeqID"`
-			Seq   int      `json:"Seq"`
 		}{}
 
 		d.Decode(&responseData)
@@ -114,7 +114,6 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		X = responseData.X
 		Y = responseData.Y
 		SeqID = responseData.SeqID
-		noFrontEnd = responseData.Seq
 		log.Println("SeqID ", SeqID)
 	}
 
@@ -130,7 +129,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 			ResetDot(strconv.Itoa(no), s)
 		}
 	} else if k == GoToSeq {
-		no = noFrontEnd
+		no, _ = strconv.Atoi(noFrontEnd)
 	} else {
 		no = 0
 	}
@@ -184,6 +183,7 @@ func RetriveDot(FILENAME string) string {
 	}
 
 	return start + result + end
+	// return "[[1, 230, 330]]"
 }
 
 //EncodeImage file image to base64
