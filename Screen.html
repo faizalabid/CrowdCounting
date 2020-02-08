@@ -30,13 +30,18 @@
                             <input type="hidden" id="iscallback" name="iscallback" />
                             <input type="hidden" id="X" name="X" />
                             <input type="hidden" id="Y" name="Y" />
-                            <input type="button" value="Perv" name="BTN_PRV" id="BTN_PRV" onclick="fnPerv()" width="150"/>
+                            <input type="button" value="Prev" name="BTN_PRV" id="BTN_PRV" onclick="fnPerv()" width="150"/>
                             <input type="button" value="Next" name="BTN_NXT" id="BTN_NXT" onclick="fnNext()" width="150"/>
                         </td>
                     </tr>
                 </table>
 
                 <input id="hiddenCoordinatesList" type="hidden" value="{{.points}}"/>
+
+                <label>Image Name:</label><span>{{filename}}</span><br/>
+                <label>Sequence:</label><span>{{sequence}}</span><br/>
+                <button id="buttonGoTo" type="button" value="Go To"/><input id="inputGoTo" type="number"/>
+
                 <table id="tableCoordinates" class="table">
 
                     <thead>
@@ -49,7 +54,7 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                <button type="button" id="deleteButtonSubmit">Delete all checked dots</button>
+                <button type="button" id="buttonDeleteSubmit">Delete all checked dots</button>
             </form>
         </div>
 
@@ -137,9 +142,15 @@
                 document.getElementById("Form1").submit()
             }
 
-            document.getElementById("deleteButtonSubmit").addEventListener("click", () => {
+            document.getElementById("buttonDeleteSubmit").addEventListener("click", () => {
                 submitDelete()
             })
+
+            function fnGoTo() {
+                document.getElementById("Mode").value = 5
+                document.getElementById("Seq").value = parseInt(document.getElementById("inputGoTo").value)
+                document.getElementById("Form1").submit()
+            }
 
             function getPosition(event){
                 var rect = document.getElementById("canvas").getBoundingClientRect();
