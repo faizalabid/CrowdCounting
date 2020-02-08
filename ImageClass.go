@@ -22,7 +22,7 @@ import (
 	// "math"
 	"net/http"
 	"os"
-	_ "github.com/denisenkom/go-mssqldb"
+	// _ "github.com/denisenkom/go-mssqldb"
 )
 
 var (
@@ -94,13 +94,13 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	if k == "" {
 		d := json.NewDecoder(r.Body)
 		d.DisallowUnknownFields()
-		
+
 		responseData := struct {
-			Mode  string `json:"mode"`
-			X     string `json:"X"`
-			Y     string `json:"Y"`
+			Mode  string   `json:"mode"`
+			X     string   `json:"X"`
+			Y     string   `json:"Y"`
 			SeqID []string `json:"SeqID"`
-			Seq int `json:"Seq"`
+			Seq   int      `json:"Seq"`
 		}{}
 
 		d.Decode(&responseData)
@@ -113,7 +113,6 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("SeqID ", SeqID)
 	}
 
-	
 	// PostBack := r.Form.Get("iscallback")
 	if k == "1" {
 		no = no + 1
@@ -123,8 +122,8 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		no = no + 0
 	} else if k == "4" {
 		for _, s := range SeqID {
-	   		ResetDot(strconv.Itoa(no), s)
-	   }
+			ResetDot(strconv.Itoa(no), s)
+		}
 	} else if k == "5" {
 		no = noFrontEnd
 	} else {
@@ -145,7 +144,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(point)
 
-	var data = map[string]string{"image": img, "points": point, "filename":filenm ,"sequence":strconv.Itoa(no)}
+	var data = map[string]string{"image": img, "points": point, "filename": filenm, "sequence": strconv.Itoa(no)}
 
 	t, _ := template.ParseFiles("Screen.html")
 	t.Execute(w, data)
@@ -154,33 +153,33 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 //RetriveDot Retrive dot from Database
 func RetriveDot(FILENAME string) string {
 
-	conn :=GetConn()
-	rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
-	if err != nil {
-		fmt.Println(err)
-	}
+	// conn := GetConn()
+	// rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
-	var (
-		X      string
-		Y      string
-		id     string
-		str    string
-		result string
-	)
+	// var (
+	// 	X      string
+	// 	Y      string
+	// 	id     string
+	// 	str    string
+	// 	result string
+	// )
 
-	start := "["
-	end := "]"
-	spr := ","
+	// start := "["
+	// end := "]"
+	// spr := ","
 
-	for rows.Next() {
-		if err := rows.Scan(&id, &X, &Y); err == nil {
-			str = start + id + spr + X + spr + Y + end + spr
-			result = result + str
-		}
-	}
+	// for rows.Next() {
+	// 	if err := rows.Scan(&id, &X, &Y); err == nil {
+	// 		str = start + id + spr + X + spr + Y + end + spr
+	// 		result = result + str
+	// 	}
+	// }
 
-	return start + result + end
-	// return "[[17,269.07999992370605,206.44000053405762],]"
+	// return start + result + end
+	return "[[17,269.07999992370605,206.44000053405762],]"
 }
 
 //EncodeImage file image to base64
