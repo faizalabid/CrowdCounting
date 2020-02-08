@@ -119,7 +119,7 @@
                 }
             }
 
-            function submitDelete() {
+            async function submitDelete() {
                 let idList = []
 
                 document.querySelectorAll("input[type=checkbox]").forEach(input => {
@@ -128,10 +128,13 @@
                     }
                 })
 
-                axios.post('/Show', {
+                await axios.post('/Show', {
                     Mode: "4",
                     SeqID: idList
                 })
+
+                document.getElementById("Mode").value = 3
+                document.getElementById("Form1").submit()
             }
 
             document.getElementById("deleteButtonSubmit").addEventListener("click", () => {
@@ -191,7 +194,6 @@
                         deleteCheckBox.id = [coordinates[0]]
                         deleteCheckBox.type = "checkbox"
                         deleteCheckBox.addEventListener("click", (e) => {
-                            console.log(e.target.checked)
                             if (e.target.checked) {
                                 drawCoordinates(coordinates[1], coordinates[2], coordinates[0], "#ff0000")
                             } else {
