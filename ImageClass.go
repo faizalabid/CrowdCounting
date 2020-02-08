@@ -8,21 +8,21 @@ import (
 	"fmt"
 	"html/template"
 
-	//"image"
-	//"image/draw"
+	// "image"
+	// "image/draw"
 	"strconv"
 
-	//"image/png"
-	//"image/color"
+	// "image/png"
+	// "image/color"
 	"image/jpeg"
 	"io"
 	"io/ioutil"
 	"log"
 
-	//"math"
+	// "math"
 	"net/http"
 	"os"
-	// _ "github.com/denisenkom/go-mssqldb"
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 var (
@@ -55,7 +55,7 @@ func QueryExecDB(qry string) {
 
 //GetConn connect to db
 func GetConn() *sql.DB {
-	condb, errdb := sql.Open("sqlserver", "server=localhost;user id=sa;password=deemes;database=ThesisData")
+	condb, errdb := sql.Open("sqlserver", "server=192.168.40.7;user id=sa;password=deemes;database=ThesisData")
 	if errdb != nil {
 		fmt.Println(" Error open db:", errdb.Error())
 	}
@@ -64,7 +64,8 @@ func GetConn() *sql.DB {
 
 //ResetDot reset dot sesuai nomor
 func ResetDot(no string, seqID string) {
-	Q := "delete GROUNDTRUTH_DATA WHERE type = 'Train' and ID = '" + seqID + "'"
+	log.Println("Seq Id masuk reset: ", seqID)
+	Q := "delete GROUNDTRUTH_DATA WHERE ID = '" + seqID + "'"
 
 	QueryExecDB(Q)
 }
@@ -144,33 +145,33 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 //RetriveDot Retrive dot from Database
 func RetriveDot(FILENAME string) string {
 
-	// conn := GetConn()
-	// rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	conn :=GetConn()
+	rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	// var (
-	// 	X      string
-	// 	Y      string
-	// 	id     string
-	// 	str    string
-	// 	result string
-	// )
+	var (
+		X      string
+		Y      string
+		id     string
+		str    string
+		result string
+	)
 
-	// start := "["
-	// end := "]"
-	// spr := ","
+	start := "["
+	end := "]"
+	spr := ","
 
-	// for rows.Next() {
-	// 	if err := rows.Scan(&id, &X, &Y); err == nil {
-	// 		str = start + id + spr + X + spr + Y + end + spr
-	// 		result = result + str
-	// 	}
-	// }
+	for rows.Next() {
+		if err := rows.Scan(&id, &X, &Y); err == nil {
+			str = start + id + spr + X + spr + Y + end + spr
+			result = result + str
+		}
+	}
 
-	// return start + result + end
-	return "[[17,269.07999992370605,206.44000053405762],]"
+	return start + result + end
+	// return "[[17,269.07999992370605,206.44000053405762],]"
 }
 
 //EncodeImage file image to base64
