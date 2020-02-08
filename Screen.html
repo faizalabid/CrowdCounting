@@ -181,11 +181,14 @@
 
                 document.getElementById("X").value = x
                 document.getElementById("Y").value = y
+                var pointSize = 3;
 
                 ctx.beginPath();
-                ctx.font = "18px Arial"
+                ctx.font = "10px Arial"
                 ctx.fillStyle = color;
+                ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
                 ctx.fillText(id || "", x, y);
+                ctx.fill();
             }
 
             function redrawCoordinates() {

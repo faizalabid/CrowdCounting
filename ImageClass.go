@@ -34,6 +34,7 @@ var (
 	Add        = "3"
 	Delete     = "4"
 	GoToSeq    = "5"
+	DataGroup  = "Train"
 )
 
 func main() {
@@ -78,7 +79,7 @@ func ResetDot(no string, seqID string) {
 
 //SaveRedDot SAVE
 func SaveRedDot(x string, y string, filenm string, no string) {
-	Q := "INSERT INTO GROUNDTRUTH_DATA(FILENAME,X,Y,SEQ,TYPE) " + "VALUES('" + filenm + "','" + x + "','" + y + "','" + no + "','Train')"
+	Q := "INSERT INTO GROUNDTRUTH_DATA(FILENAME,X,Y,SEQ,TYPE) " + "VALUES('" + filenm + "','" + x + "','" + y + "','" + no + "','" + DataGroup + "')"
 
 	QueryExecDB(Q)
 }
@@ -189,7 +190,7 @@ func RetriveDot(FILENAME string) string {
 //EncodeImage file image to base64
 func EncodeImage(images os.FileInfo) string {
 
-	ImgFile, err := os.Open("./PhotoFolder/train/" + images.Name())
+	ImgFile, err := os.Open("./PhotoFolder/" + DataGroup + "/" + images.Name())
 	if err != nil {
 		// Handle error
 	}
@@ -214,7 +215,7 @@ func EncodeImage(images os.FileInfo) string {
 
 //Readfile => FUngsi Baca File from directory
 func Readfile(i int) os.FileInfo {
-	files, err1 := ioutil.ReadDir("./PhotoFolder/train/")
+	files, err1 := ioutil.ReadDir("./PhotoFolder/" + DataGroup + "/")
 	if err1 != nil {
 		log.Fatal(err1)
 	}
