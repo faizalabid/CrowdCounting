@@ -22,12 +22,17 @@ import (
 	// "math"
 	"net/http"
 	"os"
-	// _ "github.com/denisenkom/go-mssqldb"
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 var (
 	no         int
 	sqlversion string
+	Next = "1"
+	Prev = "2"
+	Add = "3"
+	Delete = "4"
+	GoToSeq = "5"
 )
 
 func main() {
@@ -114,17 +119,17 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// PostBack := r.Form.Get("iscallback")
-	if k == "1" {
+	if k == Next {
 		no = no + 1
-	} else if k == "2" {
+	} else if k == Prev {
 		no = no - 1
-	} else if k == "3" {
+	} else if k == Add {
 		no = no + 0
-	} else if k == "4" {
+	} else if k == Delete {
 		for _, s := range SeqID {
 			ResetDot(strconv.Itoa(no), s)
 		}
-	} else if k == "5" {
+	} else if k == GoToSeq {
 		no = noFrontEnd
 	} else {
 		no = 0
@@ -153,33 +158,32 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 //RetriveDot Retrive dot from Database
 func RetriveDot(FILENAME string) string {
 
-	// conn := GetConn()
-	// rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	conn := GetConn()
+	rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	// var (
-	// 	X      string
-	// 	Y      string
-	// 	id     string
-	// 	str    string
-	// 	result string
-	// )
+	var (
+		X      string
+		Y      string
+		id     string
+		str    string
+		result string
+	)
 
-	// start := "["
-	// end := "]"
-	// spr := ","
+	start := "["
+	end := "]"
+	spr := ","
 
-	// for rows.Next() {
-	// 	if err := rows.Scan(&id, &X, &Y); err == nil {
-	// 		str = start + id + spr + X + spr + Y + end + spr
-	// 		result = result + str
-	// 	}
-	// }
+	for rows.Next() {
+		if err := rows.Scan(&id, &X, &Y); err == nil {
+			str = start + id + spr + X + spr + Y + end + spr
+			result = result + str
+		}
+	}
 
-	// return start + result + end
-	return "[[17,269.07999992370605,206.44000053405762],]"
+	return start + result + end
 }
 
 //EncodeImage file image to base64
