@@ -38,6 +38,7 @@
 
                 <input id="hiddenCoordinatesList" type="hidden" value="{{.points}}"/>
                 <table id="tableCoordinates" class="table">
+
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -48,6 +49,7 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <button type="button" id="deleteButtonSubmit">Delete all checked dots</button>
             </form>
         </div>
 
@@ -117,6 +119,25 @@
                 }
             }
 
+            function submitDelete() {
+                let idList = []
+
+                document.querySelectorAll("input[type=checkbox]").forEach(input => {
+                    if (input.checked) {
+                        idList.push(input.id)
+                    }
+                })
+
+                axios.post('/Show', {
+                    Mode: "4",
+                    SeqID: idList
+                })
+            }
+
+            document.getElementById("deleteButtonSubmit").addEventListener("click", () => {
+                submitDelete()
+            })
+
             function getPosition(event){
                 var rect = document.getElementById("canvas").getBoundingClientRect();
                 var x = event.clientX - rect.left;
@@ -133,7 +154,7 @@
                 })
             }
 
-            function drawCoordinates(x, y, id = null){	
+            function drawCoordinates(x, y, id = null, color){	
                 var ctx = document.getElementById("canvas").getContext("2d");
 
                 document.getElementById("X").value = x
@@ -141,13 +162,13 @@
 
                 ctx.beginPath();
                 ctx.font = "18px Arial"
-                ctx.fillStyle = "#ff0000";
+                ctx.fillStyle = color;
                 ctx.fillText(id || "", x, y);
             }
 
             function redrawCoordinates() {
                 hiddenCoordinatesList.forEach(coordinates => {
-                    drawCoordinates(coordinates[1], coordinates[2], coordinates[0])
+                    drawCoordinates(coordinates[1], coordinates[2], coordinates[0], "#2ecc71")
                 })
             }
 
@@ -166,15 +187,19 @@
                     })
 
                     const buttonCell = document.createElement("td")
-
-                        const deleteButton = document.createElement("button")
-                        deleteButton.type = "button"
-                        deleteButton.innerHTML = "X"
-                        deleteButton.addEventListener("click", () => {
-                            fnDelete(coordinates[0])
+                        const deleteCheckBox = document.createElement("input")
+                        deleteCheckBox.id = [coordinates[0]]
+                        deleteCheckBox.type = "checkbox"
+                        deleteCheckBox.addEventListener("click", (e) => {
+                            console.log(e.target.checked)
+                            if (e.target.checked) {
+                                drawCoordinates(coordinates[1], coordinates[2], coordinates[0], "#ff0000")
+                            } else {
+                                drawCoordinates(coordinates[1], coordinates[2], coordinates[0], "#2ecc71")
+                            }
                         })
 
-                    buttonCell.appendChild(deleteButton)
+                    buttonCell.appendChild(deleteCheckBox)
                     tableRow.appendChild(buttonCell)
                     
                     tableCoordinatesBody.appendChild(tableRow)
