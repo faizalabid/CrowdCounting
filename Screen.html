@@ -158,7 +158,7 @@
                 fnGoTo()
             })
 
-            function getPosition(event){
+            async function getPosition(event){
                 var rect = document.getElementById("canvas").getBoundingClientRect();
                 var x = event.clientX - rect.left;
                 var y = event.clientY - rect.top;
@@ -167,7 +167,7 @@
                 document.getElementById("Mode").value = 3
                 document.getElementById("iscallback").value = 0
 
-                axios.post('/Show', {	
+                await axios.post('/Show', {	
                     Mode: "3",	
                     X: `${x}`,	
                     Y: `${y}`	
