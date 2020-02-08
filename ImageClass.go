@@ -8,18 +8,18 @@ import (
 	"fmt"
 	"html/template"
 
-	//"image"
-	//"image/draw"
+	// "image"
+	// "image/draw"
 	"strconv"
 
-	//"image/png"
-	//"image/color"
+	// "image/png"
+	// "image/color"
 	"image/jpeg"
 	"io"
 	"io/ioutil"
 	"log"
 
-	//"math"
+	// "math"
 	"net/http"
 	"os"
 
@@ -29,6 +29,11 @@ import (
 var (
 	no         int
 	sqlversion string
+	Next       = "1"
+	Prev       = "2"
+	Add        = "3"
+	Delete     = "4"
+	GoToSeq    = "5"
 )
 
 func main() {
@@ -56,7 +61,7 @@ func QueryExecDB(qry string) {
 
 //GetConn connect to db
 func GetConn() *sql.DB {
-	condb, errdb := sql.Open("sqlserver", "server=localhost;user id=sa;password=deemes;database=ThesisData")
+	condb, errdb := sql.Open("sqlserver", "server=192.168.40.7;user id=sa;password=deemes;database=ThesisData")
 	if errdb != nil {
 		fmt.Println(" Error open db:", errdb.Error())
 	}
@@ -64,8 +69,9 @@ func GetConn() *sql.DB {
 }
 
 //ResetDot reset dot sesuai nomor
-func ResetDot(no string) {
-	Q := "delete GROUNDTRUTH_DATA WHERE type = 'Train' and seq = '" + no + "'"
+func ResetDot(no string, seqID string) {
+	log.Println("Seq Id masuk reset: ", seqID)
+	Q := "delete GROUNDTRUTH_DATA WHERE ID = '" + seqID + "'"
 
 	QueryExecDB(Q)
 }
@@ -87,35 +93,43 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	k := r.PostFormValue("Mode")
+	noFrontEnd := r.PostFormValue("Seq")
 	X := ""
 	Y := ""
+	var SeqID []string
 	if k == "" {
 		d := json.NewDecoder(r.Body)
 		d.DisallowUnknownFields()
 
 		responseData := struct {
-			Mode string `json:"mode"`
-			X    string `json:"X"`
-			Y    string `json:"Y"`
+			Mode  string   `json:"mode"`
+			X     string   `json:"X"`
+			Y     string   `json:"Y"`
+			SeqID []string `json:"SeqID"`
 		}{}
 
 		d.Decode(&responseData)
-		log.Println(responseData)
 
 		k = responseData.Mode
 		X = responseData.X
 		Y = responseData.Y
+		SeqID = responseData.SeqID
+		log.Println("SeqID ", SeqID)
 	}
 
 	// PostBack := r.Form.Get("iscallback")
-	if k == "1" {
+	if k == Next {
 		no = no + 1
-	} else if k == "2" {
+	} else if k == Prev {
 		no = no - 1
-	} else if k == "3" {
+	} else if k == Add {
 		no = no + 0
-	} else if k == "4" {
-		ResetDot(strconv.Itoa(no))
+	} else if k == Delete {
+		for _, s := range SeqID {
+			ResetDot(strconv.Itoa(no), s)
+		}
+	} else if k == GoToSeq {
+		no, _ = strconv.Atoi(noFrontEnd)
 	} else {
 		no = 0
 	}
@@ -130,46 +144,46 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//retrive dot
-	Xall, Yall := RetriveDot(filenm)
+	point := RetriveDot(filenm)
 
-	log.Println(Xall)
-	log.Println(Yall)
+	log.Println(point)
 
-	var data = map[string]string{"image": img, "X": Xall, "Y": Yall}
+	var data = map[string]string{"image": img, "points": point, "filename": filenm, "sequence": strconv.Itoa(no)}
 
 	t, _ := template.ParseFiles("Screen.html")
 	t.Execute(w, data)
 }
 
 //RetriveDot Retrive dot from Database
-func RetriveDot(FILENAME string) (string, string) {
+func RetriveDot(FILENAME string) string {
 
 	conn := GetConn()
-	rows, err := conn.Query("select X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
+	rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	var (
-		X   string
-		Y   string
-		xtr string
-		ytr string
+		X      string
+		Y      string
+		id     string
+		str    string
+		result string
 	)
 
+	start := "["
+	end := "]"
+	spr := ","
+
 	for rows.Next() {
-		if err := rows.Scan(&X, &Y); err == nil {
-			xtr = xtr + X + ","
-			ytr = ytr + Y + ","
-			//xtr = append(xtr, X)
-			//ytr = append(ytr, Y)
+		if err := rows.Scan(&id, &X, &Y); err == nil {
+			str = start + id + spr + X + spr + Y + end + spr
+			result = result + str
 		}
 	}
 
-	// xtr := "323,412,426"
-	// ytr := "144,156,133"
-
-	return xtr, ytr
+	return start + result + end
+	// return "[[1, 230, 330]]"
 }
 
 //EncodeImage file image to base64
