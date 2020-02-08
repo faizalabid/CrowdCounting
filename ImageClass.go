@@ -89,16 +89,16 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	k := r.PostFormValue("Mode")
 	X := ""
 	Y := ""
-	SeqID := ""
+	var SeqID []string
 	if k == "" {
 		d := json.NewDecoder(r.Body)
 		d.DisallowUnknownFields()
-
+		
 		responseData := struct {
 			Mode  string `json:"mode"`
 			X     string `json:"X"`
 			Y     string `json:"Y"`
-			SeqID string `json:"SeqID"`
+			SeqID []string `json:"SeqID"`
 		}{}
 
 		d.Decode(&responseData)
@@ -107,8 +107,10 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		X = responseData.X
 		Y = responseData.Y
 		SeqID = responseData.SeqID
+		log.Println("SeqID ", SeqID)
 	}
 
+	
 	// PostBack := r.Form.Get("iscallback")
 	if k == "1" {
 		no = no + 1
@@ -117,7 +119,9 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	} else if k == "3" {
 		no = no + 0
 	} else if k == "4" {
-		ResetDot(strconv.Itoa(no), SeqID)
+		for _, s := range SeqID {
+	   		ResetDot(strconv.Itoa(no), s)
+	   }
 	} else {
 		no = 0
 	}
