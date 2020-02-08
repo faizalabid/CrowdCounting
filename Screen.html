@@ -165,9 +165,14 @@
                 
                 drawCoordinates(x,y);
                 document.getElementById("Mode").value = 3
-                document.getElementById("X").value = x
-                document.getElementById("Y").value = y
                 document.getElementById("iscallback").value = 0
+
+                axios.post('/Show', {	
+                    Mode: "3",	
+                    X: `${x}`,	
+                    Y: `${y}`	
+                })
+
                 document.getElementById("Form1").submit()
             }
 
