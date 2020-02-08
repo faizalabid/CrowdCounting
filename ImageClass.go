@@ -22,8 +22,7 @@ import (
 	//"math"
 	"net/http"
 	"os"
-
-	_ "github.com/denisenkom/go-mssqldb"
+	// _ "github.com/denisenkom/go-mssqldb"
 )
 
 var (
@@ -64,8 +63,8 @@ func GetConn() *sql.DB {
 }
 
 //ResetDot reset dot sesuai nomor
-func ResetDot(no string) {
-	Q := "delete GROUNDTRUTH_DATA WHERE type = 'Train' and seq = '" + no + "'"
+func ResetDot(no string, seqID string) {
+	Q := "delete GROUNDTRUTH_DATA WHERE type = 'Train' and ID = '" + seqID + "'"
 
 	QueryExecDB(Q)
 }
@@ -89,22 +88,24 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	k := r.PostFormValue("Mode")
 	X := ""
 	Y := ""
+	SeqID := ""
 	if k == "" {
 		d := json.NewDecoder(r.Body)
 		d.DisallowUnknownFields()
 
 		responseData := struct {
-			Mode string `json:"mode"`
-			X    string `json:"X"`
-			Y    string `json:"Y"`
+			Mode  string `json:"mode"`
+			X     string `json:"X"`
+			Y     string `json:"Y"`
+			SeqID string `json:"SeqID"`
 		}{}
 
 		d.Decode(&responseData)
-		log.Println(responseData)
 
 		k = responseData.Mode
 		X = responseData.X
 		Y = responseData.Y
+		SeqID = responseData.SeqID
 	}
 
 	// PostBack := r.Form.Get("iscallback")
@@ -115,7 +116,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	} else if k == "3" {
 		no = no + 0
 	} else if k == "4" {
-		ResetDot(strconv.Itoa(no))
+		ResetDot(strconv.Itoa(no), SeqID)
 	} else {
 		no = 0
 	}
@@ -143,35 +144,33 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 //RetriveDot Retrive dot from Database
 func RetriveDot(FILENAME string) string {
 
-	conn := GetConn()
-	rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
-	if err != nil {
-		fmt.Println(err)
-	}
+	// conn := GetConn()
+	// rows, err := conn.Query("select id, X, Y FROM GROUNDTRUTH_DATA WHERE FILENAME='" + FILENAME + "'")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
-	var (
-		X      string
-		Y      string
-		id     string
-		str    string
-		result string
-	)
+	// var (
+	// 	X      string
+	// 	Y      string
+	// 	id     string
+	// 	str    string
+	// 	result string
+	// )
 
-	start := "["
-	end := "]"
-	spr := ","
+	// start := "["
+	// end := "]"
+	// spr := ","
 
-	for rows.Next() {
-		if err := rows.Scan(&id, &X, &Y); err == nil {
-			str = start + id + spr + X + spr + Y + end + spr
-			result = result + str
-		}
-	}
+	// for rows.Next() {
+	// 	if err := rows.Scan(&id, &X, &Y); err == nil {
+	// 		str = start + id + spr + X + spr + Y + end + spr
+	// 		result = result + str
+	// 	}
+	// }
 
-	// xtr := "323,412,426"
-	// ytr := "144,156,133"
-
-	return start + result + end
+	// return start + result + end
+	return "[[17,269.07999992370605,206.44000053405762],]"
 }
 
 //EncodeImage file image to base64

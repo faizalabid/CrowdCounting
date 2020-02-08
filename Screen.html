@@ -2,11 +2,18 @@
 <html>
     <head>
         <meta charset="UTF-8" />
+
+        <style>
+            .table td {
+                padding: 8px 20px;
+            }
+        </style>
     </head>
     <body>
         <div>
             <form method="POST" action="/Show" id="Form1">
                 <table>
+
                     <tr>
                         <td>
                             <canvas id="canvas" style="background-image:url(data:image/jpg;base64,{{.image}})" width="640" height="360" onclick="getPosition(event)" >
@@ -25,27 +32,28 @@
                             <input type="hidden" id="Y" name="Y" />
                             <input type="button" value="Perv" name="BTN_PRV" id="BTN_PRV" onclick="fnPerv()" width="150"/>
                             <input type="button" value="Next" name="BTN_NXT" id="BTN_NXT" onclick="fnNext()" width="150"/>
-                            <input type="button" value="Reset" name="BTN_RST" id="BTN_RST" onclick="if(confirm('maur reset?'))fnReset()" width="50"/>
                         </td>
                     </tr>
                 </table>
-                <div id="coordinatesX">
-                    X Coordinates: [{{.X}}]
-                </div>
 
-                <div id="coordinatesY">
-                    Y Coordinates: [{{.Y}}]
-                </div>
-
-                <div>
-                    Points : {{.points}}
-                </div>
+                <input id="hiddenCoordinatesList" type="hidden" value="{{.points}}"/>
+                <table id="tableCoordinates" class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>X</th>
+                            <th>Y</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </form>
         </div>
 
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script>            
-            var pointSize = 3;
+            const hiddenCoordinatesList = eval(document.getElementById("hiddenCoordinatesList").value)
         
             function fnNext()
             {
@@ -59,10 +67,20 @@
                 document.getElementById("Form1").submit()
             }
 
+            function fnClearCanvas()
+            {
+                const canvas = document.getElementById("canvas")
+                const ctx = canvas.getContext("2d")
+                ctx.clearRect(0, 0, 640, 360)
+            }
+
             function fnReset()
             {
                 document.getElementById("Mode").value = 4
-                document.getElementById("Form1").submit()
+                axios.post('/Show', {
+                    Mode: "4",
+                    SeqID: "1"
+                })
             }
 
             function fnSave()
@@ -72,8 +90,35 @@
                 document.getElementById("Form1").submit()
             }
 
+            async function fnDelete(id)
+            {
+                try {
+                    await axios.post('/Show', {
+                        Mode: "4",
+                        SeqID: `${id}`
+                    })
+                } catch (ex) {
+                    const currentCanvas = document.getElementById("canvas")
+
+                    const newCanvas = document.createElement("canvas")
+                    newCanvas.id = "canvas"
+                    newCanvas.width = currentCanvas.width
+                    newCanvas.height = currentCanvas.height
+                    newCanvas.addEventListener("click", (event) => {
+                        getPosition(event)
+                    })
+                    newCanvas.style.backgroundImage = currentCanvas.style.backgroundImage
+
+                    const canvasParent = currentCanvas.parentNode
+                    canvasParent.removeChild(currentCanvas)
+                    canvasParent.appendChild(newCanvas)
+
+                    window.location.reload(true); 
+                }
+            }
+
             function getPosition(event){
-                var rect = canvas.getBoundingClientRect();
+                var rect = document.getElementById("canvas").getBoundingClientRect();
                 var x = event.clientX - rect.left;
                 var y = event.clientY - rect.top;
                 
@@ -88,34 +133,55 @@
                 })
             }
 
-            function drawCoordinates(x,y){	
+            function drawCoordinates(x, y, id = null){	
                 var ctx = document.getElementById("canvas").getContext("2d");
 
                 document.getElementById("X").value = x
                 document.getElementById("Y").value = y
-                ctx.fillStyle = "#ff2626"; // Red color
 
                 ctx.beginPath();
-                ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
-                ctx.fill();
+                ctx.font = "18px Arial"
+                ctx.fillStyle = "#ff0000";
+                ctx.fillText(id || "", x, y);
             }
 
-            const arrayReg = new RegExp("\\[.+\\]")
-            const squareBracketReg = new RegExp("(\\[|\\])", "g")
+            function redrawCoordinates() {
+                hiddenCoordinatesList.forEach(coordinates => {
+                    drawCoordinates(coordinates[1], coordinates[2], coordinates[0])
+                })
+            }
 
             try {
-                const coorX = document.getElementById("coordinatesX").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
-                const coorY = document.getElementById("coordinatesY").innerHTML.match(arrayReg)[0].replace(squareBracketReg, "").split(",")
+                redrawCoordinates()
 
-                coorX.forEach((pointX, index) => {
-                    const pointY = coorY[index]
+                const tableCoordinatesBody = document.getElementById("tableCoordinates").querySelector("tbody")
 
-                    drawCoordinates(pointX, pointY)
-                })
-            } catch {
+                hiddenCoordinatesList.forEach(coordinates => {
+                    const tableRow = document.createElement("tr")
 
+                    coordinates.forEach(value => {
+                        const rowCell = document.createElement("td")
+                        rowCell.innerHTML = value
+                        tableRow.appendChild(rowCell)
+                    })
+
+                    const buttonCell = document.createElement("td")
+
+                        const deleteButton = document.createElement("button")
+                        deleteButton.type = "button"
+                        deleteButton.innerHTML = "X"
+                        deleteButton.addEventListener("click", () => {
+                            fnDelete(coordinates[0])
+                        })
+
+                    buttonCell.appendChild(deleteButton)
+                    tableRow.appendChild(buttonCell)
+                    
+                    tableCoordinatesBody.appendChild(tableRow)
+                });
+            } catch (ex) {
+                console.error(ex)
             }
-
         </script>
     </body>
 </html>
