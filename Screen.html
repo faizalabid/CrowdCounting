@@ -11,7 +11,7 @@
     </head>
     <body>
         <div>
-            <form method="POST" action="/Show" id="Form1">
+            <input method="POST" action="/Show" id="Form1">
                 <table>
 
                     <tr>
@@ -39,9 +39,10 @@
 
                 <input id="hiddenCoordinatesList" type="hidden" value="{{.points}}"/>
 
-                <label>Image Name:</label><span>{{filename}}</span><br/>
-                <label>Sequence:</label><span>{{sequence}}</span><br/>
-                <button id="buttonGoTo" type="button" value="Go To"/><input id="inputGoTo" type="number"/>
+                <label>Image Name:</label><span>{{.filename}}</span><br/>
+                <label>Sequence:</label><span>{{.sequence}}</span><br/>
+                <input id="inputGoTo" type="number"></input>
+                <button id="buttonGoTo" type="button">Go To</button>
 
                 <table id="tableCoordinates" class="table">
 
