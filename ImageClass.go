@@ -87,6 +87,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	k := r.PostFormValue("Mode")
+	noFrontEnd := 0
 	X := ""
 	Y := ""
 	var SeqID []string
@@ -99,6 +100,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 			X     string `json:"X"`
 			Y     string `json:"Y"`
 			SeqID []string `json:"SeqID"`
+			Seq int `json:"Seq"`
 		}{}
 
 		d.Decode(&responseData)
@@ -107,6 +109,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		X = responseData.X
 		Y = responseData.Y
 		SeqID = responseData.SeqID
+		noFrontEnd = responseData.Seq
 		log.Println("SeqID ", SeqID)
 	}
 
@@ -122,6 +125,8 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 		for _, s := range SeqID {
 	   		ResetDot(strconv.Itoa(no), s)
 	   }
+	} else if k == "5" {
+		no = noFrontEnd
 	} else {
 		no = 0
 	}
@@ -140,7 +145,7 @@ func ImageClassHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(point)
 
-	var data = map[string]string{"image": img, "points": point}
+	var data = map[string]string{"image": img, "points": point, "filename":filenm ,"sequence":strconv.Itoa(no)}
 
 	t, _ := template.ParseFiles("Screen.html")
 	t.Execute(w, data)
