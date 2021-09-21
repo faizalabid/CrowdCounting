@@ -62,7 +62,7 @@ func QueryExecDB(qry string) {
 
 //GetConn connect to db
 func GetConn() *sql.DB {
-	condb, errdb := sql.Open("sqlserver", "server=192.168.40.7;user id=sa;password=deemes;database=ThesisData")
+	condb, errdb := sql.Open("sqlserver", "server=.;user id=sa;password=deemes;database=ThesisData")
 	if errdb != nil {
 		fmt.Println(" Error open db:", errdb.Error())
 	}
